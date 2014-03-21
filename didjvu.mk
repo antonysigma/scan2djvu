@@ -27,12 +27,13 @@ $(prefix)-converted.pdf:$(pdf_pages)
 
 $(pdf_pages):%.pdf:%.djvu
 #	Extract layers
-	ddjvu -mode=background -format=tiff $< $(tmp)/$(notdir $*)-bg.tif
-	ddjvu -mode=mask -page=1 -format=pbm $< $(tmp)/$(notdir $*)-bw.pbm
-#	ddjvu -mode=foreground -page=1 -format=pdf $< $*-ft.pdf
-#	Convert foreground to best format
-	convert $(tmp)/$(notdir $*)-bw.pbm -threshold 1 -transparent white -compress jbig2 $(tmp)/$(notdir $*)-bw.pdf
-	convert $(tmp)/$(notdir $*)-bg.tif -compress jpeg2000 $(tmp)/$(notdir $*)-bg.pdf
+	ddjvu -mode=black -format=tif $< $(tmp)/$*-fore.tif
+	ddjvu -mode=background -format=tif $< $(tmp)/$*-back.tif
+#	Compress layers
+	convert $(tmp)/$*-fore.tif -transparent white -compress zip -format pdfa $(tmp)/$*-fore.pdf
+	convert $(tmp)/$*-back.tif -compress jpeg2000 -define jp2:rate=0.001 -format pdfa $(tmp)/$*-back.pdf
+#	jbig2 -s -p -b $(tmp)/$*-fore $(tmp)/$*-fore.tif
+#	pdf.py $(tmp)/$*-fore | pdftk $(tmp)/$*-back.pdf multistamp - output $@
 #	Merge layers
-	pdftk $(tmp)/$(notdir $*)-bw.pdf multibackground $(tmp)/$(notdir $*)-bg.pdf $@
-	rm $(tmp)/$(notdir $*)-*
+	pdftk $(tmp)/$*-back.pdf multistamp $(tmp)/$*-fore.pdf output $@
+	rm $(tmp)/$*-
