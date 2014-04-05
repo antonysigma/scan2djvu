@@ -15,7 +15,7 @@ all:$(prefix).djvu
 
 $(prefix).djvu:$(djvu_pages)
 	djvm -c $@ $^ &&\
-	ocrodjvu -j4 -etesseract -leng --in-place $@
+#	ocrodjvu -j4 -etesseract -leng --in-place $@
 
 $(djvu_pages):%.djvu:%.tif
 #	Image segmentation

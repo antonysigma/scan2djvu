@@ -1,23 +1,23 @@
 SHELL:=/bin/bash
+tmp:=/dev/shm
 
-prefix=out
 dpi=600
-
-tmp=/dev/shm
 ext=tif
 
-djvu_pages=$(subst .$(ext),.djvu,$(wildcard $(prefix)/*.$(ext)))
+djvu_pages=$(subst .$(ext),.djvu,$(wildcard *.$(ext)))
 pdf_pages=$(subst .djvu,.pdf,$(djvu_pages))
 
-all:$(prefix).djvu
+all:$(djvu_pages)
 
-$(prefix).djvu:$(djvu_pages)
-	djvm -c $@ $^
-	ocrodjvu -j4 -etesseract -leng --in-place $@
 
 $(djvu_pages):%.djvu:%.$(ext)
-	mogrify -trim -normalize -compress lzw $<
-	didjvu encode --loss-level 200 -m djvu -d $(dpi) $< -o $@
+#	mogrify -trim -normalize -compress lzw $<
+	if [ `identify -format '%k' $<` -gt 2 ]; then \
+		didjvu encode --loss-level 200 -m djvu -d $(dpi) $< -o $@; \
+	else \
+		mogrify -depth 1 $< && \
+		cjb2 -losslevel 200 -dpi $(dpi) $< $@; \
+	fi
 	
 ###############################################################
 pdf:$(prefix)-converted.pdf
