@@ -30,7 +30,7 @@ $(pdf_pages):%.pdf:%.djvu
 	ddjvu -mode=foreground -format=tiff $< $(tmp)/$*-fore.tif
 	ddjvu -mode=background -format=tiff $< $(tmp)/$*-back.tif
 #	Compress layers
-	convert $(tmp)/$*-fore.tif -dither Riemersma -colors 16 -transparent white -compress lzw -format pdfa $(tmp)/$*-fore.pdf
+	convert $(tmp)/$*-fore.tif -transparent white -compress jpeg -interlace jpeg -quality 15 -format pdfa $(tmp)/$*-fore.pdf
 	convert $(tmp)/$*-back.tif -compress jpeg2000 -define jp2:rate=0.001 -format pdfa $(tmp)/$*-back.pdf
 #	jbig2 -s -p -b $(tmp)/$*-fore $(tmp)/$*-fore.tif
 #	pdf.py $(tmp)/$*-fore | pdftk $(tmp)/$*-back.pdf multistamp - output $@
