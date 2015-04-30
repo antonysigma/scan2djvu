@@ -1,0 +1,1 @@
+Compress scanned documents (esp. students assignments) from PDF to DjVu.
